@@ -6,7 +6,7 @@ import argparse
 from naoqi import ALProxy, ALBehavior
 import time
 import speech_recognition as sr
-
+import wave
 
 tts = audio = record = aup = None
 
@@ -28,34 +28,39 @@ def main(robot_IP, robot_PORT = 9559):
     # ----------> recording <----------
     print 'start recording...'
 
-    from types import FunctionType
-    print [method for method in dir(audio) if callable(getattr(audio, method))]
-
+    audio.openAudioInputs()
     record_path = '/home/nao/record.wav'
 
     # moze trzeba zrobic cos takiego?
-    # noise_output = wave.open('sample.wav', 'w')
-    # noise_output.setparams((2, 2, 44100, 0, 'NONE', 'not compressed'))
+    noise_output = wave.open('sample.wav', 'w')
+    noise_output.setparams((1, 4, 48000, 0, 'NONE', 'not compressed'))
     #(nchannels, sampwidth, framerate, nframes, comptype, compname)
-    # kanaly, szerokosc probki, częstotliwość wyświetlania klatek, ilosc ramek
+    # kanaly, szerokosc probki, czestotliwosc wyswietlania klatek, ilosc ramek
 
     #trzeba cos wyczarowac, by to sie rzeczywiscie zapisywalo. sie nie zapisuje.
 
-    record.startMicrophonesRecording('sample.wav', 'wav', 16000, (1, 1, 1, 1))
+    record.startMicrophonesRecording('sample.wav', 'wav', 48000, (0, 0, 0, 1))#(1, 1, 1, 1))
     print " start!!!"
-    time.sleep(4)
+    time.sleep(3)
     record.stopMicrophonesRecording()
-    print 'record over'
 
-    # fileID = aup.playFile('sample.wav', 0.7, 0)
-    import os
-    dir_path = os.path.dirname(os.path.realpath('sample.wav'))
-    print dir_path
+    noise_output.close()
+    #
+    # import winsound
+    #
+    # winsound.PlaySound('man.wav', winsound.SND_FILENAME)
+
+    time.sleep(3)
+    fileID = aup.playFile('sample.wav', 0.7, 0)
 
     r = sr.Recognizer()
-    with sr.AudioFile("sample.wav") as source:
-        audio = r.record(source)  # read the entire audio file
-        print(r.recognize_google(audio))
+    with sr.AudioFile('sample.wav') as source:#sr.Microphone()
+        try:
+            audio = r.record(source)  # read the entire audio file
+            print("You said" + r.recognize_google(audio))
+        except sr.UnknownValueError:
+            tts.say("I don't understand you, sorry! ")
+
 
 
 
