@@ -21,6 +21,7 @@ class D:
 def main(robot_IP, robot_PORT = 9559):
     global tts, audio, record, aup
     # ----------> Connect to robot <----------
+    sd = ALProxy("ALSoundDetection", robot_IP, robot_PORT)
     tts = ALProxy("ALTextToSpeech", robot_IP, robot_PORT)
     audio = ALProxy("ALAudioDevice", robot_IP, robot_PORT)
     record = ALProxy("ALAudioRecorder", robot_IP, robot_PORT)
@@ -28,41 +29,28 @@ def main(robot_IP, robot_PORT = 9559):
     # ----------> recording <----------
     print 'start recording...'
 
+    sd.setParameter("Sensibility", 0.9)
     audio.openAudioInputs()
-    record_path = '/home/nao/record.wav'
+    # record_path = '/home/nao/audio/record.wav'
 
-    # moze trzeba zrobic cos takiego?
-    noise_output = wave.open('sample.wav', 'w')
-    noise_output.setparams((1, 4, 48000, 0, 'NONE', 'not compressed'))
+    # noise_output = wave.open('sample.wav', 'w')
+    # noise_output.setparams((1, 4, 16000, 0, 'NONE', 'not compressed'))
     #(nchannels, sampwidth, framerate, nframes, comptype, compname)
     # kanaly, szerokosc probki, czestotliwosc wyswietlania klatek, ilosc ramek
 
-    #trzeba cos wyczarowac, by to sie rzeczywiscie zapisywalo. sie nie zapisuje.
-
-    record.startMicrophonesRecording('sample.wav', 'wav', 48000, (0, 0, 0, 1))#(1, 1, 1, 1))
+    record.startMicrophonesRecording('record.wav', 'wav', 16000, (1, 0, 0, 0))
     print " start!!!"
     time.sleep(3)
     record.stopMicrophonesRecording()
 
-    noise_output.close()
-    #
-    # import winsound
-    #
-    # winsound.PlaySound('man.wav', winsound.SND_FILENAME)
-
-    time.sleep(3)
-    fileID = aup.playFile('sample.wav', 0.7, 0)
-
+    aup.playFile('record.wav', 0.7, 0)
     r = sr.Recognizer()
-    with sr.AudioFile('sample.wav') as source:#sr.Microphone()
+    with sr.AudioFile('record.wav') as source:#sr.Microphone()
         try:
-            audio = r.record(source)  # read the entire audio file
-            print("You said" + r.recognize_google(audio))
+            audio = r.record(source)# read the entire audio file
+            tts.say("You said " + r.recognize_sphinx(audio))
         except sr.UnknownValueError:
-            tts.say("I don't understand you, sorry! ")
-
-
-
+            tts.say("sorry")#"I don't understand you, sorry! ")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -71,44 +59,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 main(args.ip, args.port)
+
 #192.168.210.109
-
-# czesc kodu, ktora czyni, ze nao sie nie meczy
-
-
-# import sys
-# from naoqi import ALProxy
-#
-# def main(robotIP):
-#     PORT = 9559
-#
-#     try:
-#         motionProxy = ALProxy("ALMotion", robotIP, PORT)
-#     except Exception, e:
-#         print "Could not create proxy to ALMotion"
-#         print "Error was: ", e
-#
-#     try:
-#         postureProxy = ALProxy("ALRobotPosture", robotIP, PORT)
-#     except Exception, e:
-#         print "Could not create proxy to ALRobotPosture"
-#         print "Error was: ", e
-#
-#     # Send NAO to Pose Init
-#     postureProxy.goToPosture("StandInit", 0.5)
-#
-#     motionProxy.rest()
-#
-#     # print motion state
-#     print motionProxy.getSummary()
-#
-#
-# if __name__ == "__main__":
-#     robotIp = "192.168.210.109"
-#
-#     if len(sys.argv) <= 1:
-#         print "Usage python almotion_rest.py robotIP (optional default: 127.0.0.1)"
-#     else:
-#         robotIp = sys.argv[1]
-#
-#     main(robotIp)

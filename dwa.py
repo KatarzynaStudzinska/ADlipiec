@@ -19,7 +19,7 @@ class MyAudioModule(ALModule):
     def __init__( self, strName, args):
         ALModule.__init__( self, strName );
 
-        self.saveFile = open('test2.raw', 'wb')
+        self.saveFile = open('test2.wav', 'w')#('test2.raw', 'wb')
         # Create a proxy to ALAudioDevice
         try:
             self.ALAudioDevice = ALProxy("ALAudioDevice", args.IP, args.PORT)
@@ -30,7 +30,7 @@ class MyAudioModule(ALModule):
 
         print "setClientPreferences " + str(args.rate)
         channels = [1, 1, 1, 1]
-        isDeinterleaved = False
+        isDeinterleaved = True
         isTimeStampped = True# in fact this parameter is not read. Time stamps are always calculated.
         self.ALAudioDevice.setClientPreferences(self.getName(), args.rate, channels, 0, 0)
 
@@ -81,6 +81,6 @@ if __name__ == "__main__":
 
     r = sr.Recognizer()
     print ("poznalem co nastepuje:")
-    with sr.AudioFile("test2.wav") as source:
+    with sr.AudioFile(ALSoundDiagnostic.saveFile) as source:
         audio = r.record(source)  # read the entire audio file
         print(r.recognize_google(audio))

@@ -2,7 +2,7 @@ import time
 from naoqi import ALProxy
 
 
-ROBOT_IP = "your.robot.ip.here"
+ROBOT_IP = "192.168.210.109"
 
 # Creates a proxy on the speech-recognition module
 asr = ALProxy("ALSpeechRecognition", ROBOT_IP, 9559)
@@ -16,5 +16,5 @@ asr.setVocabulary(vocabulary, False)
 # Start the speech recognition engine with user Test_ASR
 asr.subscribe("Test_ASR")
 print 'Speech recognition engine started'
-time.sleep(20)
+time.sleep(4)
 asr.unsubscribe("Test_ASR")
