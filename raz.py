@@ -6,7 +6,7 @@ import argparse
 from naoqi import ALProxy, ALBehavior
 import time
 import speech_recognition as sr
-import wave
+import os
 
 tts = audio = record = aup = None
 
@@ -31,26 +31,30 @@ def main(robot_IP, robot_PORT = 9559):
 
     sd.setParameter("Sensibility", 0.9)
     audio.openAudioInputs()
-    # record_path = '/home/nao/audio/record.wav'
+    record_path = '/home/nao/audio/wista.wav'
 
     # noise_output = wave.open('sample.wav', 'w')
     # noise_output.setparams((1, 4, 16000, 0, 'NONE', 'not compressed'))
     #(nchannels, sampwidth, framerate, nframes, comptype, compname)
     # kanaly, szerokosc probki, czestotliwosc wyswietlania klatek, ilosc ramek
 
-    record.startMicrophonesRecording('record.wav', 'wav', 16000, (1, 0, 0, 0))
-    print " start!!!"
-    time.sleep(3)
+    # noise_output = wave.open('file.wav', 'w')
+    record.startMicrophonesRecording('wista.wav', 'wav', 16000, (1, 0, 0, 0))
+
+    print("start!!!")
+    time.sleep(5)
+    print("stop!!!")
     record.stopMicrophonesRecording()
 
-    aup.playFile('record.wav', 0.7, 0)
-    r = sr.Recognizer()
-    with sr.AudioFile('record.wav') as source:#sr.Microphone()
-        try:
-            audio = r.record(source)# read the entire audio file
-            tts.say("You said " + r.recognize_sphinx(audio))
-        except sr.UnknownValueError:
-            tts.say("sorry")#"I don't understand you, sorry! ")
+    # record_to_read = aup.playFile('/home/nao/audio/wista.wav', 0.1, 0)
+    #
+    # r = sr.Recognizer()
+    # with sr.AudioFile('audio/wista.wav') as source:#sr.Microphone()
+    #     try:
+    #         audio = r.record(source)# read the entire audio file
+    #         print("You said " + r.recognize_sphinx(audio))
+    #     except sr.UnknownValueError:
+    #         tts.say("sorry")#"I don't understand you, sorry! ")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
