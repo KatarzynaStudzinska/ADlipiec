@@ -10,13 +10,6 @@ import os
 
 tts = audio = record = aup = None
 
-class D:
-
-    def __init__(self):
-        pass
-
-    def p(self):
-        pass
 
 def main(robot_IP, robot_PORT = 9559):
     global tts, audio, record, aup
@@ -26,6 +19,8 @@ def main(robot_IP, robot_PORT = 9559):
     audio = ALProxy("ALAudioDevice", robot_IP, robot_PORT)
     record = ALProxy("ALAudioRecorder", robot_IP, robot_PORT)
     aup = ALProxy("ALAudioPlayer", robot_IP, robot_PORT)
+    mem = ALProxy('ALMemory', robot_IP, robot_PORT)
+    print(mem.getDataListName())
     # ----------> recording <----------
     print 'start recording...'
 
@@ -42,19 +37,20 @@ def main(robot_IP, robot_PORT = 9559):
     record.startMicrophonesRecording('wista.wav', 'wav', 16000, (1, 0, 0, 0))
 
     print("start!!!")
-    time.sleep(5)
+    time.sleep(35)
     print("stop!!!")
     record.stopMicrophonesRecording()
 
     # record_to_read = aup.playFile('/home/nao/audio/wista.wav', 0.1, 0)
     #
-    # r = sr.Recognizer()
-    # with sr.AudioFile('audio/wista.wav') as source:#sr.Microphone()
-    #     try:
-    #         audio = r.record(source)# read the entire audio file
-    #         print("You said " + r.recognize_sphinx(audio))
-    #     except sr.UnknownValueError:
-    #         tts.say("sorry")#"I don't understand you, sorry! ")
+    r = sr.Recognizer()
+    with sr.AudioFile('audio/wista.wav') as source:#sr.Microphone()
+        try:
+            audio = r.record(source)# read the entire audio file
+            print("You said " + r.recognize_sphinx(audio))
+        except sr.UnknownValueError:
+            tts.say("sorry")#"I don't understand you, sorry! ")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
